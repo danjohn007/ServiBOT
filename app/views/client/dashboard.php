@@ -45,7 +45,7 @@
                     <i class="fas fa-user-edit fa-3x text-info mb-3"></i>
                     <h5>Mi Perfil</h5>
                     <p class="card-text text-muted">Actualiza tu información personal</p>
-                    <a href="<?php echo $baseUrl; ?>profile" class="btn btn-info">
+                    <a href="<?php echo $baseUrl; ?>client/profile" class="btn btn-info">
                         <i class="fas fa-edit"></i> Editar Perfil
                     </a>
                 </div>

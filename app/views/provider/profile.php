@@ -55,7 +55,7 @@
                         </div>
                         <div class="card-body">
                             <form method="POST" action="<?php echo $baseUrl; ?>provider/profile">
-                                <?php echo generateCsrfToken(); ?>
+                                <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
 
                                 <!-- Basic Information -->
                                 <div class="mb-4">

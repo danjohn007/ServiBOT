@@ -9,7 +9,7 @@ CREATE TABLE users (
     id INT PRIMARY KEY AUTO_INCREMENT,
     email VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
-    role ENUM('superadmin', 'cliente', 'prestador') NOT NULL,
+    role ENUM('superadmin', 'cliente', 'prestador', 'franquicitario') NOT NULL,
     name VARCHAR(255) NOT NULL,
     phone VARCHAR(20),
     address TEXT,

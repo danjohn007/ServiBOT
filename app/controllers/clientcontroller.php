@@ -25,7 +25,24 @@ class ClientController extends BaseController {
     public function requests() {
         $this->data['pageTitle'] = 'Mis Solicitudes - ServiBOT';
         
+        $this->data['requests'] = $this->getClientRequests();
+        
         $this->view('client/requests', $this->data);
+    }
+    
+    /**
+     * Create new service request
+     */
+    public function new_request() {
+        $this->data['pageTitle'] = 'Nueva Solicitud de Servicio - ServiBOT';
+        
+        if ($this->isPost()) {
+            $this->handleNewRequest();
+        }
+        
+        $this->data['services'] = $this->getAllServices();
+        
+        $this->view('client/new_request', $this->data);
     }
     
     /**
@@ -132,6 +149,85 @@ class ClientController extends BaseController {
             return $stmt->fetchAll();
         } catch (PDOException $e) {
             return [];
+        }
+    }
+    
+    /**
+     * Get client's service requests
+     */
+    private function getClientRequests() {
+        try {
+            $db = Database::getInstance();
+            $connection = $db->getConnection();
+            $clientId = $_SESSION['user_id'];
+            
+            $stmt = $connection->prepare("
+                SELECT sr.*, sc.name as service_name, sc.icon as service_icon,
+                       u.name as provider_name
+                FROM service_requests sr
+                LEFT JOIN service_categories sc ON sr.category_id = sc.id
+                LEFT JOIN users u ON sr.provider_id = u.id
+                WHERE sr.client_id = ?
+                ORDER BY sr.created_at DESC
+            ");
+            $stmt->execute([$clientId]);
+            
+            return $stmt->fetchAll();
+        } catch (PDOException $e) {
+            return [];
+        }
+    }
+    
+    /**
+     * Handle new service request
+     */
+    private function handleNewRequest() {
+        $this->validateCsrf();
+        
+        try {
+            $data = [
+                'client_id' => $_SESSION['user_id'],
+                'category_id' => (int) $this->getPost('category_id'),
+                'title' => $this->sanitize($this->getPost('title')),
+                'description' => $this->sanitize($this->getPost('description')),
+                'urgency' => $this->sanitize($this->getPost('urgency')),
+                'address' => $this->sanitize($this->getPost('address')),
+                'scheduled_date' => $this->getPost('scheduled_date') ?: null,
+                'status' => 'pendiente'
+            ];
+            
+            // Basic validation
+            if (empty($data['category_id']) || empty($data['title']) || empty($data['address'])) {
+                $this->data['error'] = 'Servicio, título y dirección son requeridos.';
+                return;
+            }
+            
+            // Validate scheduled date for programmed requests
+            if ($data['urgency'] === 'programado' && empty($data['scheduled_date'])) {
+                $this->data['error'] = 'Fecha programada es requerida para servicios programados.';
+                return;
+            }
+            
+            $db = Database::getInstance();
+            $connection = $db->getConnection();
+            
+            $stmt = $connection->prepare("
+                INSERT INTO service_requests 
+                (client_id, category_id, title, description, urgency, address, scheduled_date, status)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ");
+            
+            if ($stmt->execute(array_values($data))) {
+                $this->data['success'] = 'Solicitud de servicio creada exitosamente.';
+                
+                // Optionally redirect to requests list
+                // header('Location: ' . BASE_URL . 'client/requests');
+                // exit;
+            } else {
+                $this->data['error'] = 'Error al crear la solicitud de servicio.';
+            }
+        } catch (PDOException $e) {
+            $this->data['error'] = 'Error al crear la solicitud de servicio.';
         }
     }
 }

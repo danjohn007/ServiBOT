@@ -12,23 +12,18 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?php echo $baseUrl; ?>admin/users">
+                        <a class="nav-link active" href="<?php echo $baseUrl; ?>admin/users">
                             <i class="fas fa-users"></i> Usuarios
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="<?php echo $baseUrl; ?>admin/newuser">
-                            <i class="fas fa-user-plus"></i> Nuevo Usuario
+                        <a class="nav-link" href="<?php echo $baseUrl; ?>admin/pending_providers">
+                            <i class="fas fa-user-clock"></i> Prestadores por Autorizar
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="<?php echo $baseUrl; ?>admin/services">
                             <i class="fas fa-cogs"></i> Servicios
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="<?php echo $baseUrl; ?>admin/newservice">
-                            <i class="fas fa-plus-circle"></i> Nuevo Servicio
                         </a>
                     </li>
                     <li class="nav-item">
@@ -43,7 +38,7 @@
         <!-- Main content -->
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                <h1 class="h2">Crear Nuevo Usuario</h1>
+                <h1 class="h2">Editar Usuario: <?php echo htmlspecialchars($user['name']); ?></h1>
                 <div class="btn-toolbar mb-2 mb-md-0">
                     <a href="<?php echo $baseUrl; ?>admin/users" class="btn btn-outline-secondary">
                         <i class="fas fa-arrow-left"></i> Volver a Usuarios
@@ -70,23 +65,23 @@
                     <div class="card">
                         <div class="card-header">
                             <h5 class="card-title mb-0">
-                                <i class="fas fa-user-plus"></i> Información del Usuario
+                                <i class="fas fa-user-edit"></i> Información del Usuario
                             </h5>
                         </div>
                         <div class="card-body">
-                            <form method="POST" action="<?php echo $baseUrl; ?>admin/newuser">
+                            <form method="POST" action="<?php echo $baseUrl; ?>admin/users/edit/<?php echo $user['id']; ?>">
                                 <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
-
+                                
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <label for="name" class="form-label">Nombre Completo *</label>
                                         <input type="text" class="form-control" id="name" name="name" required
-                                               value="<?php echo htmlspecialchars($formData['name'] ?? ''); ?>">
+                                               value="<?php echo htmlspecialchars($user['name']); ?>">
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label for="email" class="form-label">Email *</label>
                                         <input type="email" class="form-control" id="email" name="email" required
-                                               value="<?php echo htmlspecialchars($formData['email'] ?? ''); ?>">
+                                               value="<?php echo htmlspecialchars($user['email']); ?>">
                                     </div>
                                 </div>
 
@@ -94,22 +89,22 @@
                                     <div class="col-md-6 mb-3">
                                         <label for="phone" class="form-label">Teléfono</label>
                                         <input type="tel" class="form-control" id="phone" name="phone"
-                                               value="<?php echo htmlspecialchars($formData['phone'] ?? ''); ?>">
+                                               value="<?php echo htmlspecialchars($user['phone'] ?? ''); ?>">
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label for="role" class="form-label">Tipo de Usuario *</label>
                                         <select class="form-select" id="role" name="role" required>
                                             <option value="">Selecciona...</option>
-                                            <option value="cliente" <?php echo ($formData['role'] ?? '') === 'cliente' ? 'selected' : ''; ?>>
+                                            <option value="cliente" <?php echo $user['role'] === 'cliente' ? 'selected' : ''; ?>>
                                                 Cliente
                                             </option>
-                                            <option value="prestador" <?php echo ($formData['role'] ?? '') === 'prestador' ? 'selected' : ''; ?>>
+                                            <option value="prestador" <?php echo $user['role'] === 'prestador' ? 'selected' : ''; ?>>
                                                 Prestador
                                             </option>
-                                            <option value="franquicitario" <?php echo ($formData['role'] ?? '') === 'franquicitario' ? 'selected' : ''; ?>>
+                                            <option value="franquicitario" <?php echo $user['role'] === 'franquicitario' ? 'selected' : ''; ?>>
                                                 Franquicitario
                                             </option>
-                                            <option value="superadmin" <?php echo ($formData['role'] ?? '') === 'superadmin' ? 'selected' : ''; ?>>
+                                            <option value="superadmin" <?php echo $user['role'] === 'superadmin' ? 'selected' : ''; ?>>
                                                 Administrador
                                             </option>
                                         </select>
@@ -119,48 +114,31 @@
                                 <div class="mb-3">
                                     <label for="address" class="form-label">Dirección</label>
                                     <textarea class="form-control" id="address" name="address" rows="2"
-                                              placeholder="Dirección completa"><?php echo htmlspecialchars($formData['address'] ?? ''); ?></textarea>
-                                </div>
-
-                                <!-- City selection for providers -->
-                                <div class="mb-3" id="citySection" style="display: none;">
-                                    <label for="city" class="form-label">Ciudad de Operación</label>
-                                    <select class="form-select" id="city" name="city">
-                                        <option value="">Selecciona ciudad...</option>
-                                        <?php foreach ($franchises as $franchise): ?>
-                                            <option value="<?php echo htmlspecialchars($franchise['city']); ?>"
-                                                    <?php echo ($formData['city'] ?? '') === $franchise['city'] ? 'selected' : ''; ?>>
-                                                <?php echo htmlspecialchars($franchise['city']); ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </select>
+                                              placeholder="Dirección completa"><?php echo htmlspecialchars($user['address'] ?? ''); ?></textarea>
                                 </div>
 
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
-                                        <label for="password" class="form-label">Contraseña *</label>
-                                        <input type="password" class="form-control" id="password" name="password" required
-                                               minlength="6" placeholder="Mínimo 6 caracteres">
+                                        <label for="password" class="form-label">Nueva Contraseña</label>
+                                        <input type="password" class="form-control" id="password" name="password"
+                                               minlength="6" placeholder="Dejar vacío para mantener la actual">
+                                        <small class="form-text text-muted">Solo completar si desea cambiar la contraseña</small>
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label for="active" class="form-label">Estado</label>
                                         <select class="form-select" id="active" name="active">
-                                            <option value="1" <?php echo ($formData['active'] ?? '1') === '1' ? 'selected' : ''; ?>>
-                                                Activo
-                                            </option>
-                                            <option value="0" <?php echo ($formData['active'] ?? '') === '0' ? 'selected' : ''; ?>>
-                                                Inactivo
-                                            </option>
+                                            <option value="1" <?php echo $user['is_active'] ? 'selected' : ''; ?>>Activo</option>
+                                            <option value="0" <?php echo !$user['is_active'] ? 'selected' : ''; ?>>Inactivo</option>
                                         </select>
                                     </div>
                                 </div>
 
-                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <div class="d-flex justify-content-between">
                                     <a href="<?php echo $baseUrl; ?>admin/users" class="btn btn-secondary me-md-2">
                                         Cancelar
                                     </a>
                                     <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-save"></i> Crear Usuario
+                                        <i class="fas fa-save"></i> Actualizar Usuario
                                     </button>
                                 </div>
                             </form>
@@ -172,27 +150,36 @@
                     <div class="card">
                         <div class="card-header">
                             <h6 class="card-title mb-0">
-                                <i class="fas fa-info-circle"></i> Información Importante
+                                <i class="fas fa-info-circle"></i> Información del Usuario
                             </h6>
                         </div>
                         <div class="card-body">
-                            <div class="alert alert-info">
-                                <h6><i class="fas fa-lightbulb"></i> Tipos de Usuario</h6>
-                                <ul class="mb-0">
-                                    <li><strong>Cliente:</strong> Puede solicitar servicios</li>
-                                    <li><strong>Prestador:</strong> Puede ofrecer servicios</li>
-                                    <li><strong>Administrador:</strong> Acceso completo al sistema</li>
-                                </ul>
+                            <div class="mb-3">
+                                <small class="text-muted">ID del Usuario</small>
+                                <div class="fw-bold"><?php echo $user['id']; ?></div>
                             </div>
-
-                            <div class="alert alert-warning">
-                                <h6><i class="fas fa-exclamation-triangle"></i> Prestadores</h6>
-                                <p class="mb-0">Los prestadores requieren seleccionar una ciudad de operación para poder ser asignados a servicios.</p>
+                            
+                            <div class="mb-3">
+                                <small class="text-muted">Fecha de Registro</small>
+                                <div class="fw-bold">
+                                    <?php echo $user['created_at'] ? date('d/m/Y H:i', strtotime($user['created_at'])) : 'N/A'; ?>
+                                </div>
                             </div>
-
-                            <div class="alert alert-success">
-                                <h6><i class="fas fa-shield-alt"></i> Seguridad</h6>
-                                <p class="mb-0">Las contraseñas se encriptan automáticamente por seguridad.</p>
+                            
+                            <div class="mb-3">
+                                <small class="text-muted">Última Actualización</small>
+                                <div class="fw-bold">
+                                    <?php echo $user['updated_at'] ? date('d/m/Y H:i', strtotime($user['updated_at'])) : 'N/A'; ?>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <small class="text-muted">Email Verificado</small>
+                                <div>
+                                    <span class="badge bg-<?php echo $user['email_verified'] ? 'success' : 'warning'; ?>">
+                                        <?php echo $user['email_verified'] ? 'Verificado' : 'Pendiente'; ?>
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -203,26 +190,20 @@
 </div>
 
 <script>
-// Show/hide city section based on role
 document.getElementById('role').addEventListener('change', function() {
     const citySection = document.getElementById('citySection');
-    const citySelect = document.getElementById('city');
-    
     if (this.value === 'prestador') {
         citySection.style.display = 'block';
-        citySelect.setAttribute('required', 'required');
     } else {
         citySection.style.display = 'none';
-        citySelect.removeAttribute('required');
-        citySelect.value = '';
     }
 });
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
     const roleSelect = document.getElementById('role');
-    if (roleSelect.value) {
-        roleSelect.dispatchEvent(new Event('change'));
+    if (roleSelect.value === 'prestador') {
+        document.getElementById('citySection').style.display = 'block';
     }
 });
 </script>

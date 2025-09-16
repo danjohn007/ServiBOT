@@ -27,9 +27,21 @@ class AdminController extends BaseController {
     /**
      * Handle nested routing for users
      */
-    public function users($action = null) {
+    public function users($action = null, $userId = null) {
         if ($action === 'create') {
             return $this->newuser();
+        }
+        
+        if ($action === 'edit' && $userId) {
+            return $this->edituser($userId);
+        }
+        
+        if ($action === 'view' && $userId) {
+            return $this->viewuser($userId);
+        }
+        
+        if ($action === 'toggle' && $userId) {
+            return $this->toggleuser($userId);
         }
         
         $this->data['pageTitle'] = 'Gestión de Usuarios - ServiBOT';
@@ -521,6 +533,130 @@ class AdminController extends BaseController {
             
         } catch (Exception $e) {
             $this->data['error'] = 'Error al actualizar el perfil. Intenta nuevamente.';
+        }
+    }
+    
+    /**
+     * Edit user
+     */
+    public function edituser($userId) {
+        $this->data['pageTitle'] = 'Editar Usuario - ServiBOT';
+        
+        if ($this->isPost()) {
+            $this->handleUserUpdate($userId);
+        }
+        
+        // Get user data
+        $this->data['user'] = $this->getUserById($userId);
+        if (!$this->data['user']) {
+            $this->data['error'] = 'Usuario no encontrado.';
+            header('Location: ' . BASE_URL . 'admin/users');
+            exit;
+        }
+        
+        // Get franchises for provider city selection
+        $this->data['franchises'] = $this->getAllFranchises();
+        
+        $this->view('admin/edituser', $this->data);
+    }
+    
+    /**
+     * View user details
+     */
+    public function viewuser($userId) {
+        $this->data['pageTitle'] = 'Detalles del Usuario - ServiBOT';
+        
+        $this->data['user'] = $this->getUserById($userId);
+        if (!$this->data['user']) {
+            $this->data['error'] = 'Usuario no encontrado.';
+            header('Location: ' . BASE_URL . 'admin/users');
+            exit;
+        }
+        
+        $this->view('admin/viewuser', $this->data);
+    }
+    
+    /**
+     * Toggle user active status
+     */
+    public function toggleuser($userId) {
+        try {
+            $user = $this->getUserById($userId);
+            if (!$user) {
+                $_SESSION['error'] = 'Usuario no encontrado.';
+                header('Location: ' . BASE_URL . 'admin/users');
+                exit;
+            }
+            
+            $newStatus = $user['is_active'] ? 0 : 1;
+            
+            if ($this->userModel->updateField($userId, 'is_active', $newStatus)) {
+                $_SESSION['success'] = 'Estado del usuario actualizado exitosamente.';
+            } else {
+                $_SESSION['error'] = 'Error al actualizar el estado del usuario.';
+            }
+            
+        } catch (Exception $e) {
+            $_SESSION['error'] = 'Error al actualizar el estado del usuario.';
+        }
+        
+        header('Location: ' . BASE_URL . 'admin/users');
+        exit;
+    }
+    
+    /**
+     * Handle user update
+     */
+    private function handleUserUpdate($userId) {
+        $this->validateCsrf();
+        
+        $data = [
+            'name' => $this->sanitize($this->getPost('name')),
+            'email' => $this->sanitize($this->getPost('email')),
+            'phone' => $this->sanitize($this->getPost('phone')),
+            'address' => $this->sanitize($this->getPost('address')),
+            'role' => $this->sanitize($this->getPost('role')),
+            'is_active' => (int) $this->getPost('active', 1)
+        ];
+        
+        // Basic validation
+        if (empty($data['name']) || empty($data['email'])) {
+            $this->data['error'] = 'Nombre y email son requeridos.';
+            return;
+        }
+        
+        // Check if email is already taken by another user
+        $existingUser = $this->userModel->getByEmail($data['email']);
+        if ($existingUser && $existingUser['id'] != $userId) {
+            $this->data['error'] = 'El email ya está registrado por otro usuario.';
+            return;
+        }
+        
+        // Update password if provided
+        $password = $this->getPost('password');
+        if (!empty($password)) {
+            if (strlen($password) < 6) {
+                $this->data['error'] = 'La contraseña debe tener al menos 6 caracteres.';
+                return;
+            }
+            $data['password'] = password_hash($password, PASSWORD_DEFAULT);
+        }
+        
+        if ($this->userModel->update($userId, $data)) {
+            $this->data['success'] = 'Usuario actualizado exitosamente.';
+        } else {
+            $this->data['error'] = 'Error al actualizar el usuario.';
+        }
+    }
+    
+    /**
+     * Get user by ID
+     */
+    private function getUserById($userId) {
+        try {
+            return $this->userModel->getById($userId);
+        } catch (Exception $e) {
+            return null;
         }
     }
 }

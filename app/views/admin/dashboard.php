@@ -101,6 +101,9 @@
                         <a href="<?php echo $baseUrl; ?>admin/users" class="btn btn-primary">
                             <i class="fas fa-list"></i> Ver Usuarios
                         </a>
+                        <a href="<?php echo $baseUrl; ?>admin/pending_providers" class="btn btn-warning">
+                            <i class="fas fa-user-clock"></i> Prestadores por Autorizar
+                        </a>
                         <a href="<?php echo $baseUrl; ?>admin/users/create" class="btn btn-outline-primary">
                             <i class="fas fa-plus"></i> Nuevo Usuario
                         </a>

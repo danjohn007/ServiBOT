@@ -96,6 +96,17 @@ class AdminController extends BaseController {
     }
     
     /**
+     * List pending providers awaiting authorization
+     */
+    public function pending_providers() {
+        $this->data['pageTitle'] = 'Prestadores por Autorizar - ServiBOT';
+        
+        $this->data['pendingProviders'] = $this->getPendingProviders();
+        
+        $this->view('admin/pending_providers', $this->data);
+    }
+    
+    /**
      * Approve or reject provider applications
      */
     public function approve($userId = null) {
@@ -109,7 +120,7 @@ class AdminController extends BaseController {
             }
         }
         
-        $this->redirect('admin/users');
+        $this->redirect('admin/pending_providers');
     }
     
     /**
@@ -125,6 +136,32 @@ class AdminController extends BaseController {
                        sp.city, sp.is_verified
                 FROM users u 
                 LEFT JOIN service_providers sp ON u.id = sp.user_id
+                ORDER BY u.created_at DESC
+            ");
+            $stmt->execute();
+            
+            return $stmt->fetchAll();
+        } catch (PDOException $e) {
+            return [];
+        }
+    }
+    
+    /**
+     * Get pending providers awaiting authorization
+     */
+    private function getPendingProviders() {
+        try {
+            $db = Database::getInstance();
+            $connection = $db->getConnection();
+            
+            $stmt = $connection->prepare("
+                SELECT u.id, u.name, u.email, u.phone, u.address, u.created_at,
+                       sp.city, sp.experience_years, sp.keywords, sp.is_verified
+                FROM users u
+                LEFT JOIN service_providers sp ON u.id = sp.user_id
+                WHERE u.role = 'prestador' 
+                AND (sp.is_verified = 0 OR sp.is_verified IS NULL)
+                AND u.is_active = 1
                 ORDER BY u.created_at DESC
             ");
             $stmt->execute();

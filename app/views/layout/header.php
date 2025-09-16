@@ -73,7 +73,13 @@
                                     <li><a class="dropdown-item" href="<?php echo $baseUrl; ?>provider/dashboard"><i class="fas fa-tachometer-alt"></i> Mi Panel</a></li>
                                     <li><a class="dropdown-item" href="<?php echo $baseUrl; ?>provider/requests"><i class="fas fa-briefcase"></i> Mis Servicios</a></li>
                                 <?php endif; ?>
-                                <li><a class="dropdown-item" href="<?php echo $baseUrl; ?>profile"><i class="fas fa-user-edit"></i> Mi Perfil</a></li>
+                                <?php if ($currentUser['role'] === 'cliente'): ?>
+                                    <li><a class="dropdown-item" href="<?php echo $baseUrl; ?>client/profile"><i class="fas fa-user-edit"></i> Mi Perfil</a></li>
+                                <?php elseif ($currentUser['role'] === 'prestador'): ?>
+                                    <li><a class="dropdown-item" href="<?php echo $baseUrl; ?>provider/profile"><i class="fas fa-user-edit"></i> Mi Perfil</a></li>
+                                <?php else: ?>
+                                    <li><a class="dropdown-item" href="<?php echo $baseUrl; ?>admin/profile"><i class="fas fa-user-edit"></i> Mi Perfil</a></li>
+                                <?php endif; ?>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="<?php echo $baseUrl; ?>auth/logout"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a></li>
                             </ul>

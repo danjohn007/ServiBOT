@@ -18,8 +18,8 @@ class User {
      */
     public function create($data) {
         try {
-            $sql = "INSERT INTO users (email, password, role, name, phone, address, latitude, longitude) 
-                    VALUES (:email, :password, :role, :name, :phone, :address, :latitude, :longitude)";
+            $sql = "INSERT INTO users (email, password, role, name, phone, address, latitude, longitude, is_active) 
+                    VALUES (:email, :password, :role, :name, :phone, :address, :latitude, :longitude, :is_active)";
             
             $stmt = $this->db->prepare($sql);
             
@@ -31,7 +31,8 @@ class User {
                 ':phone' => $data['phone'] ?? null,
                 ':address' => $data['address'] ?? null,
                 ':latitude' => $data['latitude'] ?? null,
-                ':longitude' => $data['longitude'] ?? null
+                ':longitude' => $data['longitude'] ?? null,
+                ':is_active' => $data['is_active'] ?? 1
             ]);
         } catch (PDOException $e) {
             return false;
@@ -54,11 +55,41 @@ class User {
     }
     
     /**
+     * Get user by email (includes inactive users)
+     */
+    public function getByEmail($email) {
+        try {
+            $sql = "SELECT * FROM users WHERE email = :email";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([':email' => $email]);
+            
+            return $stmt->fetch();
+        } catch (PDOException $e) {
+            return false;
+        }
+    }
+    
+    /**
      * Find user by ID
      */
     public function findById($id) {
         try {
             $sql = "SELECT * FROM users WHERE id = :id AND is_active = 1";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([':id' => $id]);
+            
+            return $stmt->fetch();
+        } catch (PDOException $e) {
+            return false;
+        }
+    }
+    
+    /**
+     * Get user by ID (includes inactive users)
+     */
+    public function getById($id) {
+        try {
+            $sql = "SELECT * FROM users WHERE id = :id";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([':id' => $id]);
             

@@ -90,6 +90,56 @@
                             </div>
                         </div>
                         
+                        <!-- City selection for providers -->
+                        <div class="mb-3" id="citySection" style="display: none;">
+                            <label for="city" class="form-label">
+                                <i class="fas fa-city"></i> Ciudad de Operación *
+                            </label>
+                            <select class="form-select <?php echo isset($errors['city']) ? 'is-invalid' : ''; ?>" 
+                                    id="city" 
+                                    name="city">
+                                <option value="">Selecciona tu ciudad...</option>
+                                <?php 
+                                // Get franchises for city selection
+                                if (!isset($franchises)) {
+                                    require_once MODELS_PATH . 'franchise.php';
+                                    $franchiseModel = new Franchise();
+                                    $franchises = $franchiseModel->getAll();
+                                }
+                                foreach ($franchises as $franchise): ?>
+                                    <option value="<?php echo htmlspecialchars($franchise['city']); ?>" 
+                                            <?php echo ($formData['city'] ?? '') === $franchise['city'] ? 'selected' : ''; ?>>
+                                        <?php echo htmlspecialchars($franchise['city']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                                <option value="nueva_ciudad" <?php echo ($formData['city'] ?? '') === 'nueva_ciudad' ? 'selected' : ''; ?>>
+                                    Nueva ciudad (especificar abajo)
+                                </option>
+                            </select>
+                            <div class="invalid-feedback">
+                                <?php echo $errors['city'] ?? 'Selecciona tu ciudad de operación.'; ?>
+                            </div>
+                        </div>
+                        
+                        <!-- New city input -->
+                        <div class="mb-3" id="newCitySection" style="display: none;">
+                            <label for="new_city" class="form-label">
+                                <i class="fas fa-plus-circle"></i> Especifica tu ciudad
+                            </label>
+                            <input type="text" 
+                                   class="form-control <?php echo isset($errors['new_city']) ? 'is-invalid' : ''; ?>" 
+                                   id="new_city" 
+                                   name="new_city"
+                                   value="<?php echo htmlspecialchars($formData['new_city'] ?? ''); ?>"
+                                   placeholder="Nombre de tu ciudad">
+                            <small class="form-text text-muted">
+                                Tu registro será revisado por nuestro equipo administrativo.
+                            </small>
+                            <div class="invalid-feedback">
+                                <?php echo $errors['new_city'] ?? 'Especifica el nombre de tu ciudad.'; ?>
+                            </div>
+                        </div>
+                        
                         <div class="mb-3">
                             <label for="address" class="form-label">
                                 <i class="fas fa-map-marker-alt"></i> Dirección
@@ -277,6 +327,55 @@ document.getElementById('confirm_password').addEventListener('input', function()
         this.setCustomValidity('Las contraseñas no coinciden');
     } else {
         this.setCustomValidity('');
+    }
+});
+
+// Handle role selection to show/hide city section
+document.getElementById('role').addEventListener('change', function() {
+    const citySection = document.getElementById('citySection');
+    const newCitySection = document.getElementById('newCitySection');
+    const citySelect = document.getElementById('city');
+    const newCityInput = document.getElementById('new_city');
+    
+    if (this.value === 'prestador') {
+        citySection.style.display = 'block';
+        citySelect.setAttribute('required', 'required');
+    } else {
+        citySection.style.display = 'none';
+        newCitySection.style.display = 'none';
+        citySelect.removeAttribute('required');
+        newCityInput.removeAttribute('required');
+        citySelect.value = '';
+        newCityInput.value = '';
+    }
+});
+
+// Handle city selection to show/hide new city input
+document.getElementById('city').addEventListener('change', function() {
+    const newCitySection = document.getElementById('newCitySection');
+    const newCityInput = document.getElementById('new_city');
+    
+    if (this.value === 'nueva_ciudad') {
+        newCitySection.style.display = 'block';
+        newCityInput.setAttribute('required', 'required');
+    } else {
+        newCitySection.style.display = 'none';
+        newCityInput.removeAttribute('required');
+        newCityInput.value = '';
+    }
+});
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const roleSelect = document.getElementById('role');
+    const citySelect = document.getElementById('city');
+    
+    // Trigger change events to set initial state
+    if (roleSelect.value) {
+        roleSelect.dispatchEvent(new Event('change'));
+    }
+    if (citySelect.value) {
+        citySelect.dispatchEvent(new Event('change'));
     }
 });
 </script>

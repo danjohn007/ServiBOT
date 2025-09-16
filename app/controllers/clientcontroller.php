@@ -82,7 +82,27 @@ class ClientController extends BaseController {
                 'address' => $this->sanitize($this->getPost('address'))
             ];
             
+            // Handle password change if provided
+            $newPassword = $this->getPost('new_password');
+            $confirmPassword = $this->getPost('confirm_password');
+            
+            if (!empty($newPassword)) {
+                if ($newPassword !== $confirmPassword) {
+                    $this->data['error'] = 'Las contraseñas no coinciden.';
+                    return;
+                }
+                if (strlen($newPassword) < 6) {
+                    $this->data['error'] = 'La contraseña debe tener al menos 6 caracteres.';
+                    return;
+                }
+                $data['password'] = password_hash($newPassword, PASSWORD_DEFAULT);
+            }
+            
             if ($userModel->update($userId, $data)) {
+                // Update session name if changed
+                if ($data['name'] !== $_SESSION['user_name']) {
+                    $_SESSION['user_name'] = $data['name'];
+                }
                 $this->data['success'] = 'Perfil actualizado correctamente.';
             } else {
                 $this->data['error'] = 'Error al actualizar el perfil. Intenta nuevamente.';

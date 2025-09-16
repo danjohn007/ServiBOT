@@ -38,10 +38,10 @@
                 <div class="col-md-3">
                     <h6>Contacto</h6>
                     <ul class="list-unstyled">
-                        <li><i class="fas fa-phone"></i> +52 55 1234 5678</li>
-                        <li><i class="fas fa-envelope"></i> contacto@servibot.com</li>
-                        <li><a href="mailto:contacto@servibot.com" class="text-light text-decoration-none">contacto@servibot.com</a></li>
-                        <li><i class="fas fa-map-marker-alt"></i> Ciudad de México, México</li>
+                        <li><i class="fas fa-phone"></i> +52 442 351 5156</li>
+                        <li><i class="fas fa-envelope"></i>servibot@fix360.app</li>
+                        <li><a href="mailto:servibot@fix360.app" class="text-light text-decoration-none">servibot@fix360.app</a></li>
+                        <li><i class="fas fa-map-marker-alt"></i> Querétaro, México</li>
                     </ul>
                 </div>
             </div>

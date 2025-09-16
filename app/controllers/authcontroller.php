@@ -41,6 +41,10 @@ class AuthController extends BaseController {
         
         $this->data['pageTitle'] = 'Registrarse - ServiBOT';
         
+        // Load franchises for city selection
+        $franchiseModel = $this->model('franchise');
+        $this->data['franchises'] = $franchiseModel->getAll();
+        
         if ($this->isPost()) {
             $this->handleRegister();
         } else {
@@ -110,8 +114,14 @@ class AuthController extends BaseController {
             'confirm_password' => $this->getPost('confirm_password'),
             'role' => $this->sanitize($this->getPost('role')),
             'address' => $this->sanitize($this->getPost('address')),
+            'city' => $this->sanitize($this->getPost('city')),
+            'new_city' => $this->sanitize($this->getPost('new_city')),
             'terms' => $this->getPost('terms')
         ];
+        
+        // Load franchises for the registration form
+        $franchiseModel = $this->model('franchise');
+        $this->data['franchises'] = $franchiseModel->getAll();
         
         // Validation
         $errors = $this->validateRegistration($data);
@@ -131,9 +141,23 @@ class AuthController extends BaseController {
             return;
         }
         
+        // Set approval status based on role
+        if ($data['role'] === 'cliente') {
+            $data['is_active'] = 1; // Auto-approve clients
+            $successMessage = 'Cuenta creada exitosamente. Puedes iniciar sesión.';
+        } else {
+            $data['is_active'] = 0; // Providers need approval
+            $successMessage = 'Cuenta creada exitosamente. Tu solicitud está siendo revisada por nuestro equipo. Te notificaremos cuando esté aprobada.';
+        }
+        
         // Create user
         if ($this->userModel->create($data)) {
-            $this->data['success'] = 'Cuenta creada exitosamente. Puedes iniciar sesión.';
+            // If provider, create service provider record
+            if ($data['role'] === 'prestador') {
+                $this->createProviderProfile($data);
+            }
+            
+            $this->data['success'] = $successMessage;
             $this->view('auth/login', $this->data);
         } else {
             $this->data['error'] = 'Error al crear la cuenta. Intenta de nuevo.';
@@ -183,16 +207,20 @@ class AuthController extends BaseController {
             $errors['confirm_password'] = 'Las contraseñas no coinciden.';
         }
         
-        // Map display values to database values
-        $roleMap = [
-            'Cliente - Solicitar servicios' => 'cliente',
-            'Prestador - Ofrecer servicios' => 'prestador'
-        ];
+        // Validate role directly (form already sends the correct values)
+        $validRoles = ['cliente', 'prestador'];
         
-        if (empty($data['role']) || !isset($roleMap[$data['role']])) {
+        if (empty($data['role']) || !in_array($data['role'], $validRoles)) {
             $errors['role'] = 'Selecciona un tipo de cuenta válido.';
-        } else {
-            $data['role'] = $roleMap[$data['role']];
+        }
+        
+        // Validate city for providers
+        if ($data['role'] === 'prestador') {
+            if (empty($data['city'])) {
+                $errors['city'] = 'Selecciona tu ciudad de operación.';
+            } elseif ($data['city'] === 'nueva_ciudad' && empty($data['new_city'])) {
+                $errors['new_city'] = 'Especifica el nombre de tu ciudad.';
+            }
         }
         
         if (!$data['terms']) {
@@ -200,6 +228,34 @@ class AuthController extends BaseController {
         }
         
         return $errors;
+    }
+    
+    /**
+     * Create provider profile after user registration
+     */
+    private function createProviderProfile($data) {
+        try {
+            // Get the newly created user ID
+            $user = $this->userModel->getByEmail($data['email']);
+            if (!$user) {
+                return false;
+            }
+            
+            // Determine the city to use
+            $city = $data['city'] === 'nueva_ciudad' ? $data['new_city'] : $data['city'];
+            
+            // Create service provider record
+            $db = Database::getInstance()->getConnection();
+            $sql = "INSERT INTO service_providers (user_id, city, is_verified, is_available) VALUES (:user_id, :city, 0, 0)";
+            $stmt = $db->prepare($sql);
+            
+            return $stmt->execute([
+                ':user_id' => $user['id'],
+                ':city' => $city
+            ]);
+        } catch (Exception $e) {
+            return false;
+        }
     }
     
     /**

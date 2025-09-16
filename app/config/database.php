@@ -43,9 +43,8 @@ class Database {
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             ]);
             
-            if (!file_exists($sqliteFile)) {
-                $this->createDemoTables();
-            }
+            // Check if tables exist, if not create them
+            $this->createDemoTables();
         } catch(PDOException $e) {
             die("Database connection failed: " . $e->getMessage());
         }
@@ -98,6 +97,17 @@ class Database {
             documents TEXT,
             is_verified INTEGER DEFAULT 0,
             is_available INTEGER DEFAULT 1,
+            city VARCHAR(255),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        
+        CREATE TABLE IF NOT EXISTS franchises (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name VARCHAR(255) NOT NULL,
+            city VARCHAR(255) NOT NULL,
+            representative_id INTEGER,
+            is_active INTEGER DEFAULT 1,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
@@ -130,6 +140,15 @@ class Database {
             (2, '[1]', 'plomería, fontanería, fugas, instalación, reparación, tubería, baños, cocinas, emergencias, 24 horas', 5, 4.5, 120),
             (3, '[2]', 'mecánica, automotriz, frenos, motor, transmisión, llantas, batería, emergencias, domicilio', 8, 4.8, 200)";
         $this->connection->exec($providersSql);
+        
+        // Sample franchises
+        $franchisesSql = "INSERT OR IGNORE INTO franchises (id, name, city, representative_id, is_active) VALUES
+            (1, 'ServiBOT CDMX Centro', 'Ciudad de México', 1, 1),
+            (2, 'ServiBOT Guadalajara', 'Guadalajara', 1, 1),
+            (3, 'ServiBOT Monterrey', 'Monterrey', 1, 1),
+            (4, 'ServiBOT Puebla', 'Puebla', 1, 1),
+            (5, 'ServiBOT Cancún', 'Cancún', 1, 1)";
+        $this->connection->exec($franchisesSql);
     }
     
     public static function getInstance() {

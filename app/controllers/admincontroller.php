@@ -25,9 +25,13 @@ class AdminController extends BaseController {
     }
     
     /**
-     * Manage users
+     * Handle nested routing for users
      */
-    public function users() {
+    public function users($action = null) {
+        if ($action === 'create') {
+            return $this->newuser();
+        }
+        
         $this->data['pageTitle'] = 'Gestión de Usuarios - ServiBOT';
         
         // Get all users
@@ -37,9 +41,13 @@ class AdminController extends BaseController {
     }
     
     /**
-     * Manage services
+     * Handle nested routing for services
      */
-    public function services() {
+    public function services($action = null) {
+        if ($action === 'create') {
+            return $this->newservice();
+        }
+        
         $this->data['pageTitle'] = 'Gestión de Servicios - ServiBOT';
         
         if ($this->isPost()) {
@@ -77,6 +85,39 @@ class AdminController extends BaseController {
         }
         
         $this->view('admin/newservice', $this->data);
+    }
+    
+    /**
+     * Settings management
+     */
+    public function settings() {
+        $this->data['pageTitle'] = 'Configuración - ServiBOT';
+        
+        // Redirect to franchises for now
+        header('Location: ' . BASE_URL . 'admin/franchises');
+        exit;
+    }
+    
+    /**
+     * Analytics dashboard
+     */
+    public function analytics() {
+        $this->data['pageTitle'] = 'Analíticas - ServiBOT';
+        
+        // Redirect to main dashboard for now
+        header('Location: ' . BASE_URL . 'admin');
+        exit;
+    }
+    
+    /**
+     * Reports section
+     */
+    public function reports() {
+        $this->data['pageTitle'] = 'Reportes - ServiBOT';
+        
+        // Redirect to main dashboard for now
+        header('Location: ' . BASE_URL . 'admin');
+        exit;
     }
     
     /**

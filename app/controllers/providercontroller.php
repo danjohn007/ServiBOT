@@ -138,16 +138,46 @@ class ProviderController extends BaseController {
             $phone = $this->sanitize($this->getPost('phone'));
             $address = $this->sanitize($this->getPost('address'));
             
+            // Handle password change if provided
+            $newPassword = $this->getPost('new_password');
+            $confirmPassword = $this->getPost('confirm_password');
+            
+            if (!empty($newPassword)) {
+                if ($newPassword !== $confirmPassword) {
+                    $this->data['error'] = 'Las contraseñas no coinciden.';
+                    return;
+                }
+                if (strlen($newPassword) < 6) {
+                    $this->data['error'] = 'La contraseña debe tener al menos 6 caracteres.';
+                    return;
+                }
+            }
+            
             // Start transaction
             $connection->beginTransaction();
             
-            // Update user basic info
-            $stmt = $connection->prepare("
-                UPDATE users 
-                SET name = ?, phone = ?, address = ?, updated_at = CURRENT_TIMESTAMP
-                WHERE id = ?
-            ");
-            $stmt->execute([$name, $phone, $address, $userId]);
+            // Update user basic info with or without password
+            if (!empty($newPassword)) {
+                $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+                $stmt = $connection->prepare("
+                    UPDATE users 
+                    SET name = ?, phone = ?, address = ?, password = ?, updated_at = CURRENT_TIMESTAMP
+                    WHERE id = ?
+                ");
+                $stmt->execute([$name, $phone, $address, $hashedPassword, $userId]);
+            } else {
+                $stmt = $connection->prepare("
+                    UPDATE users 
+                    SET name = ?, phone = ?, address = ?, updated_at = CURRENT_TIMESTAMP
+                    WHERE id = ?
+                ");
+                $stmt->execute([$name, $phone, $address, $userId]);
+            }
+            
+            // Update session name if changed
+            if ($name !== $_SESSION['user_name']) {
+                $_SESSION['user_name'] = $name;
+            }
             
             // Ensure provider profile exists before updating
             $providerExists = $connection->prepare("SELECT user_id FROM service_providers WHERE user_id = ?");

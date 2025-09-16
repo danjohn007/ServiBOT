@@ -183,8 +183,16 @@ class AuthController extends BaseController {
             $errors['confirm_password'] = 'Las contraseñas no coinciden.';
         }
         
-        if (empty($data['role']) || !in_array($data['role'], ['cliente', 'prestador'])) {
+        // Map display values to database values
+        $roleMap = [
+            'Cliente - Solicitar servicios' => 'cliente',
+            'Prestador - Ofrecer servicios' => 'prestador'
+        ];
+        
+        if (empty($data['role']) || !isset($roleMap[$data['role']])) {
             $errors['role'] = 'Selecciona un tipo de cuenta válido.';
+        } else {
+            $data['role'] = $roleMap[$data['role']];
         }
         
         if (!$data['terms']) {

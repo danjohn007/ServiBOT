@@ -12,6 +12,28 @@
                     La plataforma más confiable para servicios a domicilio. 
                     Conectamos clientes con los mejores especialistas cerca de ti.
                 </p>
+                
+                <!-- Search Form -->
+                <div class="mb-4">
+                    <div class="bg-white rounded-3 p-4 shadow">
+                        <form action="<?php echo $baseUrl; ?>search" method="GET" class="d-flex gap-2">
+                            <div class="flex-grow-1">
+                                <input type="text" name="q" class="form-control form-control-lg" 
+                                       placeholder="¿Qué servicio necesitas a domicilio?" 
+                                       value="<?php echo isset($_GET['q']) ? htmlspecialchars($_GET['q']) : ''; ?>">
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-lg px-4">
+                                <i class="fas fa-search"></i> Buscar
+                            </button>
+                        </form>
+                        <div class="mt-2">
+                            <small class="text-muted">
+                                Ejemplos: plomería, electricista, mecánico, limpieza, jardinería...
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="d-flex gap-3">
                     <?php if (!$currentUser): ?>
                         <a href="<?php echo $baseUrl; ?>auth/register" class="btn btn-light btn-lg">

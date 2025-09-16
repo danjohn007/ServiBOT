@@ -40,6 +40,7 @@ CREATE TABLE service_providers (
     id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT NOT NULL,
     service_categories JSON, -- Array of category IDs
+    keywords TEXT, -- Comma-separated keywords for search
     experience_years INT DEFAULT 0,
     rating DECIMAL(3, 2) DEFAULT 0.00,
     total_services INT DEFAULT 0,
@@ -155,3 +156,5 @@ CREATE INDEX idx_service_tracking_request ON service_tracking(request_id);
 CREATE INDEX idx_ratings_provider ON ratings(provider_id);
 CREATE INDEX idx_notifications_user ON notifications(user_id);
 CREATE INDEX idx_payments_request ON payments(request_id);
+CREATE INDEX idx_service_providers_keywords ON service_providers(keywords);
+CREATE INDEX idx_service_categories_name ON service_categories(name);

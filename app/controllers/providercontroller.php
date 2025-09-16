@@ -138,12 +138,24 @@ class ProviderController extends BaseController {
             $phone = $this->sanitize($this->getPost('phone'));
             $address = $this->sanitize($this->getPost('address'));
             
+            // Start transaction
+            $connection->beginTransaction();
+            
+            // Update user basic info
             $stmt = $connection->prepare("
                 UPDATE users 
                 SET name = ?, phone = ?, address = ?, updated_at = CURRENT_TIMESTAMP
                 WHERE id = ?
             ");
             $stmt->execute([$name, $phone, $address, $userId]);
+            
+            // Ensure provider profile exists before updating
+            $providerExists = $connection->prepare("SELECT user_id FROM service_providers WHERE user_id = ?");
+            $providerExists->execute([$userId]);
+            
+            if (!$providerExists->fetch()) {
+                $this->createProviderProfile($userId);
+            }
             
             // Update provider-specific info
             $serviceCategoriesJson = json_encode(array_map('intval', $serviceCategories));
@@ -156,9 +168,18 @@ class ProviderController extends BaseController {
             ");
             $stmt->execute([$keywords, $serviceCategoriesJson, $experienceYears, $coverageRadius, $userId]);
             
+            // Commit transaction
+            $connection->commit();
+            
             $this->data['success'] = 'Perfil actualizado correctamente.';
             
         } catch (PDOException $e) {
+            // Rollback transaction on error
+            if ($connection->inTransaction()) {
+                $connection->rollback();
+            }
+            // Log error for debugging (in production, log this properly)
+            error_log("Provider profile update error: " . $e->getMessage());
             $this->data['error'] = 'Error al actualizar el perfil. Intenta nuevamente.';
         }
     }

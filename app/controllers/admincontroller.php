@@ -96,6 +96,32 @@ class AdminController extends BaseController {
     }
     
     /**
+     * Admin profile management
+     */
+    public function profile() {
+        $this->data['pageTitle'] = 'Mi Perfil - ServiBOT';
+        
+        if ($this->isPost()) {
+            $this->handleProfileUpdate();
+        }
+        
+        $this->data['admin'] = $this->getAdminProfile();
+        
+        $this->view('admin/profile', $this->data);
+    }
+    
+    /**
+     * List pending providers awaiting authorization
+     */
+    public function pending_providers() {
+        $this->data['pageTitle'] = 'Prestadores por Autorizar - ServiBOT';
+        
+        $this->data['pendingProviders'] = $this->getPendingProviders();
+        
+        $this->view('admin/pending_providers', $this->data);
+    }
+    
+    /**
      * Approve or reject provider applications
      */
     public function approve($userId = null) {
@@ -109,7 +135,7 @@ class AdminController extends BaseController {
             }
         }
         
-        $this->redirect('admin/users');
+        $this->redirect('admin/pending_providers');
     }
     
     /**
@@ -125,6 +151,32 @@ class AdminController extends BaseController {
                        sp.city, sp.is_verified
                 FROM users u 
                 LEFT JOIN service_providers sp ON u.id = sp.user_id
+                ORDER BY u.created_at DESC
+            ");
+            $stmt->execute();
+            
+            return $stmt->fetchAll();
+        } catch (PDOException $e) {
+            return [];
+        }
+    }
+    
+    /**
+     * Get pending providers awaiting authorization
+     */
+    private function getPendingProviders() {
+        try {
+            $db = Database::getInstance();
+            $connection = $db->getConnection();
+            
+            $stmt = $connection->prepare("
+                SELECT u.id, u.name, u.email, u.phone, u.address, u.created_at,
+                       sp.city, sp.experience_years, sp.keywords, sp.is_verified
+                FROM users u
+                LEFT JOIN service_providers sp ON u.id = sp.user_id
+                WHERE u.role = 'prestador' 
+                AND (sp.is_verified = 0 OR sp.is_verified IS NULL)
+                AND u.is_active = 1
                 ORDER BY u.created_at DESC
             ");
             $stmt->execute();
@@ -369,6 +421,65 @@ class AdminController extends BaseController {
             $this->data['success'] = 'Prestador rechazado.';
         } catch (PDOException $e) {
             $this->data['error'] = 'Error al rechazar el prestador.';
+        }
+    }
+    
+    /**
+     * Get admin profile data
+     */
+    private function getAdminProfile() {
+        try {
+            $userModel = $this->model('user');
+            return $userModel->getById($_SESSION['user_id']);
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+    
+    /**
+     * Handle admin profile update
+     */
+    private function handleProfileUpdate() {
+        $this->validateCsrf();
+        
+        try {
+            $userModel = $this->model('user');
+            $userId = $_SESSION['user_id'];
+            
+            $data = [
+                'name' => $this->sanitize($this->getPost('name')),
+                'phone' => $this->sanitize($this->getPost('phone')),
+                'address' => $this->sanitize($this->getPost('address'))
+            ];
+            
+            // Handle password change if provided
+            $newPassword = $this->getPost('new_password');
+            $confirmPassword = $this->getPost('confirm_password');
+            
+            if (!empty($newPassword)) {
+                if ($newPassword !== $confirmPassword) {
+                    $this->data['error'] = 'Las contraseñas no coinciden.';
+                    return;
+                }
+                if (strlen($newPassword) < 6) {
+                    $this->data['error'] = 'La contraseña debe tener al menos 6 caracteres.';
+                    return;
+                }
+                $data['password'] = password_hash($newPassword, PASSWORD_DEFAULT);
+            }
+            
+            if ($userModel->update($userId, $data)) {
+                // Update session name if changed
+                if ($data['name'] !== $_SESSION['user_name']) {
+                    $_SESSION['user_name'] = $data['name'];
+                }
+                $this->data['success'] = 'Perfil actualizado correctamente.';
+            } else {
+                $this->data['error'] = 'Error al actualizar el perfil. Intenta nuevamente.';
+            }
+            
+        } catch (Exception $e) {
+            $this->data['error'] = 'Error al actualizar el perfil. Intenta nuevamente.';
         }
     }
 }

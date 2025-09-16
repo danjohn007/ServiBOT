@@ -39,7 +39,7 @@
                     <h6>Contacto</h6>
                     <ul class="list-unstyled">
                         <li><i class="fas fa-phone"></i> +52 442 351 5156</li>
-                        <li><i class="fas fa-envelope"></i>servibot@fix360.app</li>
+                        <li><i class="fas fa-envelope"></i> servibot@fix360.app</li>
                         <li><a href="mailto:servibot@fix360.app" class="text-light text-decoration-none">servibot@fix360.app</a></li>
                         <li><i class="fas fa-map-marker-alt"></i> Querétaro, México</li>
                     </ul>

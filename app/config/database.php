@@ -6,9 +6,9 @@
 
 // Database credentials - modify these according to your environment
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'servibot_db');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+define('DB_NAME', 'fix360_servibot');
+define('DB_USER', 'fix360_servibot');
+define('DB_PASS', 'Danjohn007!');
 define('DB_CHARSET', 'utf8mb4');
 
 // Database connection class

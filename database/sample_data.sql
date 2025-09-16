@@ -28,10 +28,10 @@ INSERT INTO service_categories (name, description, icon, base_price, estimated_d
 ('Fletes', 'Servicio de mudanzas y transporte', 'fas fa-truck', 350.00, 180);
 
 -- Insert service providers
-INSERT INTO service_providers (user_id, service_categories, experience_years, rating, total_services, availability_schedule, coverage_radius, documents, is_verified) VALUES
-(4, '[1]', 5, 4.5, 120, '{"lunes": "08:00-18:00", "martes": "08:00-18:00", "miercoles": "08:00-18:00", "jueves": "08:00-18:00", "viernes": "08:00-18:00", "sabado": "08:00-14:00"}', 15, '["cedula_profesional.pdf", "certificacion_plomeria.pdf"]', true),
-(5, '[2]', 8, 4.8, 200, '{"lunes": "07:00-19:00", "martes": "07:00-19:00", "miercoles": "07:00-19:00", "jueves": "07:00-19:00", "viernes": "07:00-19:00", "sabado": "07:00-15:00"}', 20, '["licencia_mecanico.pdf", "certificacion_automotriz.pdf"]', true),
-(6, '[3, 7]', 12, 4.9, 80, '{"lunes": "09:00-20:00", "martes": "09:00-20:00", "miercoles": "09:00-20:00", "jueves": "09:00-20:00", "viernes": "09:00-20:00"}', 25, '["cedula_medica.pdf", "especialidad_medicina_general.pdf"]', true);
+INSERT INTO service_providers (user_id, service_categories, keywords, experience_years, rating, total_services, availability_schedule, coverage_radius, documents, is_verified) VALUES
+(4, '[1]', 'plomería, fontanería, fugas, instalación, reparación, tubería, baños, cocinas, emergencias, 24 horas, destapado, calentadores', 5, 4.5, 120, '{"lunes": "08:00-18:00", "martes": "08:00-18:00", "miercoles": "08:00-18:00", "jueves": "08:00-18:00", "viernes": "08:00-18:00", "sabado": "08:00-14:00"}', 15, '["cedula_profesional.pdf", "certificacion_plomeria.pdf"]', true),
+(5, '[2]', 'mecánica, automotriz, frenos, motor, transmisión, suspensión, llantas, batería, emergencias, domicilio, diagnóstico', 8, 4.8, 200, '{"lunes": "07:00-19:00", "martes": "07:00-19:00", "miercoles": "07:00-19:00", "jueves": "07:00-19:00", "viernes": "07:00-19:00", "sabado": "07:00-15:00"}', 20, '["licencia_mecanico.pdf", "certificacion_automotriz.pdf"]', true),
+(6, '[3, 7]', 'medicina, consulta, médico, doctora, general, domicilio, enfermería, cuidados, salud, revisión, síntomas', 12, 4.9, 80, '{"lunes": "09:00-20:00", "martes": "09:00-20:00", "miercoles": "09:00-20:00", "jueves": "09:00-20:00", "viernes": "09:00-20:00"}', 25, '["cedula_medica.pdf", "especialidad_medicina_general.pdf"]', true);
 
 -- Insert sample service requests
 INSERT INTO service_requests (client_id, provider_id, category_id, title, description, urgency, address, latitude, longitude, status, price, additional_info) VALUES

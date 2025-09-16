@@ -67,98 +67,18 @@ foreach ($directories as $name => $path) {
     }
 }
 
-// Create SQLite database
-echo "\n💾 Configurando base de datos SQLite...\n";
-
-try {
-    $pdo = new PDO('sqlite:database/servibot.sqlite');
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    
-    // Create tables
-    $sql = "
-    CREATE TABLE users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        email VARCHAR(255) UNIQUE NOT NULL,
-        password VARCHAR(255) NOT NULL,
-        role VARCHAR(20) NOT NULL,
-        name VARCHAR(255) NOT NULL,
-        phone VARCHAR(20),
-        address TEXT,
-        latitude DECIMAL(10, 8),
-        longitude DECIMAL(11, 8),
-        profile_image VARCHAR(255),
-        is_active INTEGER DEFAULT 1,
-        email_verified INTEGER DEFAULT 0,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
-    
-    CREATE TABLE service_categories (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name VARCHAR(255) NOT NULL,
-        description TEXT,
-        icon VARCHAR(255),
-        base_price DECIMAL(10, 2) DEFAULT 0,
-        estimated_duration INTEGER DEFAULT 60,
-        is_active INTEGER DEFAULT 1,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
-    ";
-    
-    $pdo->exec($sql);
-    echo "✅ Tablas creadas exitosamente.\n";
-    
-    // Create admin user
-    $adminPassword = password_hash('password', PASSWORD_DEFAULT);
-    $stmt = $pdo->prepare("
-        INSERT INTO users (email, password, role, name, phone, address, latitude, longitude) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    ");
-    
-    $stmt->execute([
-        'admin@servibot.com',
-        $adminPassword,
-        'superadmin',
-        'Administrador ServiBOT',
-        '555-0100',
-        'Oficina Central',
-        19.4326,
-        -99.1332
-    ]);
-    
-    echo "✅ Usuario administrador creado.\n";
-    echo "   Email: admin@servibot.com\n";
-    echo "   Contraseña: password\n\n";
-    
-    // Create sample services
-    $services = [
-        ['Plomería', 'Servicios de plomería y fontanería', 'fas fa-wrench', 300.00, 120],
-        ['Mecánica', 'Reparación de vehículos a domicilio', 'fas fa-car', 500.00, 180],
-        ['Medicina', 'Consultas médicas a domicilio', 'fas fa-user-md', 800.00, 60],
-        ['Programación', 'Desarrollo y soporte técnico', 'fas fa-code', 1000.00, 240],
-        ['Limpieza', 'Servicios de limpieza doméstica', 'fas fa-broom', 200.00, 120],
-        ['Entrenamiento', 'Entrenador personal a domicilio', 'fas fa-dumbbell', 400.00, 90],
-        ['Enfermería', 'Cuidados de enfermería', 'fas fa-heartbeat', 600.00, 60],
-        ['Fletes', 'Servicio de mudanzas y transporte', 'fas fa-truck', 350.00, 180]
-    ];
-    
-    $stmt = $pdo->prepare("
-        INSERT INTO service_categories (name, description, icon, base_price, estimated_duration) 
-        VALUES (?, ?, ?, ?, ?)
-    ");
-    
-    foreach ($services as $service) {
-        $stmt->execute($service);
-    }
-    
-    echo "✅ Servicios de ejemplo creados (" . count($services) . " servicios).\n";
-    
-} catch (PDOException $e) {
-    echo "❌ Error configurando base de datos: " . $e->getMessage() . "\n";
-    exit(1);
-}
-
+// MySQL Database Setup
+echo "\n💾 Configuración de MySQL requerida...\n";
+echo "Para completar la instalación:\n";
+echo "1. Crear base de datos MySQL: 'servibot_db'\n";
+echo "2. Ejecutar: mysql -u root -p servibot_db < database/schema.sql\n";
+echo "3. Ejecutar: mysql -u root -p servibot_db < database/sample_data.sql\n";
+echo "4. Configurar credenciales en app/config/database.php\n";
+echo "\nEjemplo de configuración:\n";
+echo "define('DB_HOST', 'localhost');\n";
+echo "define('DB_NAME', 'servibot_db');\n";
+echo "define('DB_USER', 'tu_usuario');\n";
+echo "define('DB_PASS', 'tu_contraseña');\n\n";
 // Check web server configuration
 echo "\n🌐 Verificando configuración del servidor...\n";
 
@@ -182,20 +102,26 @@ try {
     echo "✅ Configuración cargada correctamente.\n";
     echo "   Base URL detectada: " . BASE_URL . "\n";
     
-    $db = Database::getInstance();
-    $conn = $db->getConnection();
-    
-    $stmt = $conn->query("SELECT COUNT(*) as count FROM users");
-    $result = $stmt->fetch();
-    echo "✅ Conexión a base de datos: OK (" . $result['count'] . " usuarios)\n";
-    
-    $stmt = $conn->query("SELECT COUNT(*) as count FROM service_categories");
-    $result = $stmt->fetch();
-    echo "✅ Servicios disponibles: " . $result['count'] . "\n";
+    // Try to connect to MySQL if configured
+    try {
+        $db = Database::getInstance();
+        $conn = $db->getConnection();
+        
+        $stmt = $conn->query("SELECT COUNT(*) as count FROM users");
+        $result = $stmt->fetch();
+        echo "✅ Conexión a base de datos MySQL: OK (" . $result['count'] . " usuarios)\n";
+        
+        $stmt = $conn->query("SELECT COUNT(*) as count FROM service_categories");
+        $result = $stmt->fetch();
+        echo "✅ Servicios disponibles: " . $result['count'] . "\n";
+    } catch (Exception $dbError) {
+        echo "⚠️  Base de datos MySQL no configurada aún.\n";
+        echo "   Configure las credenciales en app/config/database.php\n";
+        echo "   y ejecute los scripts SQL en database/\n";
+    }
     
 } catch (Exception $e) {
     echo "❌ Error en pruebas: " . $e->getMessage() . "\n";
-    exit(1);
 }
 
 // Final instructions

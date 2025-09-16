@@ -105,7 +105,7 @@
                             <small class="text-muted">Desde $800</small>
                         </div>
                     </div>
-                    <a href="<?php echo $baseUrl; ?>services" class="btn btn-outline-primary btn-sm w-100">
+                    <a href="<?php echo $baseUrl; ?>client/services" class="btn btn-outline-primary btn-sm w-100">
                         Ver todos los servicios
                     </a>
                 </div>

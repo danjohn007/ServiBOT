@@ -181,6 +181,7 @@
                                 <ul class="mb-0">
                                     <li><strong>Cliente:</strong> Puede solicitar servicios</li>
                                     <li><strong>Prestador:</strong> Puede ofrecer servicios</li>
+                                    <li><strong>Franquicitario:</strong> Gestiona franquicias y finanzas</li>
                                     <li><strong>Administrador:</strong> Acceso completo al sistema</li>
                                 </ul>
                             </div>

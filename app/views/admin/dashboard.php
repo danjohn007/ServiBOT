@@ -178,6 +178,34 @@
             </div>
         </div>
     </div>
+
+    <!-- Financial Module Section -->
+    <div class="row g-4 mt-2">
+        <div class="col-12">
+            <div class="card dashboard-card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-line"></i>
+                        Módulo Financiero
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">Accede al módulo financiero para gestionar transacciones, reportes y análisis financieros.</p>
+                    <div class="d-flex gap-2">
+                        <a href="<?php echo $baseUrl; ?>financial" class="btn btn-success">
+                            <i class="fas fa-chart-bar"></i> Dashboard Financiero
+                        </a>
+                        <a href="<?php echo $baseUrl; ?>financial/transactions" class="btn btn-outline-success">
+                            <i class="fas fa-list"></i> Ver Transacciones
+                        </a>
+                        <a href="<?php echo $baseUrl; ?>financial/reports" class="btn btn-outline-success">
+                            <i class="fas fa-file-chart-line"></i> Reportes
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <?php require_once VIEWS_PATH . 'layout/footer.php'; ?>

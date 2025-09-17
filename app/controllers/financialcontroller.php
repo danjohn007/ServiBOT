@@ -7,7 +7,9 @@ class FinancialController extends BaseController {
     public function __construct() {
         parent::__construct();
         // Financial module is accessible to all authenticated users
-        checkAuth();
+        if (!isLoggedIn()) {
+            redirect('auth/login');
+        }
     }
     
     /**

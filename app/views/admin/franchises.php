@@ -274,8 +274,8 @@
                             <input type="text" class="form-control" id="franchise_name" name="name" required>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="franchise_location" class="form-label">Ubicación *</label>
-                            <input type="text" class="form-control" id="franchise_location" name="location" required>
+                            <label for="franchise_city" class="form-label">Ciudad *</label>
+                            <input type="text" class="form-control" id="franchise_city" name="city" required>
                         </div>
                     </div>
                     

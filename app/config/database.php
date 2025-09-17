@@ -6,8 +6,8 @@
 
 // Database credentials - modify these according to your environment
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'fix360_servibot');
-define('DB_USER', 'fix360_servibot');
+define('DB_NAME', 'fix360_servicios');
+define('DB_USER', 'fix360_servicios');
 define('DB_PASS', 'Danjohn007!');
 define('DB_CHARSET', 'utf8mb4');
 

@@ -12,7 +12,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?php echo $baseUrl; ?>services/request">
+                        <a class="nav-link" href="<?php echo $baseUrl; ?>client/new_request">
                             <i class="fas fa-plus-circle"></i> Nueva Solicitud
                         </a>
                     </li>
@@ -22,8 +22,13 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?php echo $baseUrl; ?>services">
+                        <a class="nav-link" href="<?php echo $baseUrl; ?>client/services">
                             <i class="fas fa-search"></i> Ver Servicios
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?php echo $baseUrl; ?>financial">
+                            <i class="fas fa-chart-line"></i> Financiero
                         </a>
                     </li>
                     <li class="nav-item">
@@ -41,7 +46,7 @@
                 <h1 class="h2">Mis Solicitudes de Servicio</h1>
                 <div class="btn-toolbar mb-2 mb-md-0">
                     <div class="btn-group me-2">
-                        <a href="<?php echo $baseUrl; ?>services/request" class="btn btn-primary">
+                        <a href="<?php echo $baseUrl; ?>client/new_request" class="btn btn-primary">
                             <i class="fas fa-plus"></i> Nueva Solicitud
                         </a>
                     </div>

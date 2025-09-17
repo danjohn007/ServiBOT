@@ -197,6 +197,7 @@
                                                 $roleColors = [
                                                     'cliente' => 'success',
                                                     'prestador' => 'info', 
+                                                    'franquicitario' => 'primary',
                                                     'superadmin' => 'warning'
                                                 ];
                                                 $roleColor = $roleColors[$user['role']] ?? 'secondary';
@@ -221,20 +222,20 @@
                                             </td>
                                             <td>
                                                 <div class="btn-group btn-group-sm">
-                                                    <button type="button" class="btn btn-outline-primary" title="Ver Detalles">
+                                                    <a href="<?php echo $baseUrl; ?>admin/users/view/<?php echo $user['id']; ?>" class="btn btn-outline-primary" title="Ver Detalles">
                                                         <i class="fas fa-eye"></i>
-                                                    </button>
-                                                    <button type="button" class="btn btn-outline-secondary" title="Editar">
+                                                    </a>
+                                                    <a href="<?php echo $baseUrl; ?>admin/users/edit/<?php echo $user['id']; ?>" class="btn btn-outline-secondary" title="Editar">
                                                         <i class="fas fa-edit"></i>
-                                                    </button>
+                                                    </a>
                                                     <?php if ($user['is_active']): ?>
-                                                        <button type="button" class="btn btn-outline-warning" title="Desactivar">
+                                                        <a href="<?php echo $baseUrl; ?>admin/users/toggle/<?php echo $user['id']; ?>" class="btn btn-outline-warning" title="Desactivar" onclick="return confirm('¿Desactivar este usuario?')">
                                                             <i class="fas fa-user-slash"></i>
-                                                        </button>
+                                                        </a>
                                                     <?php else: ?>
-                                                        <button type="button" class="btn btn-outline-success" title="Activar">
+                                                        <a href="<?php echo $baseUrl; ?>admin/users/toggle/<?php echo $user['id']; ?>" class="btn btn-outline-success" title="Activar" onclick="return confirm('¿Activar este usuario?')">
                                                             <i class="fas fa-user-check"></i>
-                                                        </button>
+                                                        </a>
                                                     <?php endif; ?>
                                                 </div>
                                             </td>

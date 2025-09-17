@@ -1,8 +1,8 @@
 -- ServiBOT Database Schema
 -- MySQL 5.7 Compatible
 
-CREATE DATABASE IF NOT EXISTS servibot_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE servibot_db;
+-- CREATE DATABASE IF NOT EXISTS servibot_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+-- USE servibot_db;
 
 -- Users table (handles all user types)
 CREATE TABLE users (
@@ -156,5 +156,5 @@ CREATE INDEX idx_service_tracking_request ON service_tracking(request_id);
 CREATE INDEX idx_ratings_provider ON ratings(provider_id);
 CREATE INDEX idx_notifications_user ON notifications(user_id);
 CREATE INDEX idx_payments_request ON payments(request_id);
-CREATE INDEX idx_service_providers_keywords ON service_providers(keywords);
+CREATE INDEX idx_service_providers_keywords ON service_providers(keywords(100));
 CREATE INDEX idx_service_categories_name ON service_categories(name);
